@@ -8,6 +8,14 @@
             [knossos.core :refer (analysis)]
             [knossos.op :as op]))
 
+(defn sequential-history [functions test-case]
+  (let [machine (create-machine)]
+    (mapcat (fn [action]
+              (let [value ((functions action) machine)]
+                [(op/invoke :solo action value)
+                 (op/ok     :solo action value)]))
+            test-case)))
+
 (defn annotate [id f history]
   (fn [me machine]
     (let [history-start (swap! history conj (op/invoke me id nil))
@@ -25,6 +33,13 @@
                         (op process-id machine))))]
     (dorun (map deref (.invokeAll clojure.lang.Agent/soloExecutor processes)))
     @history))
+
+(defspec machine1-should-fit-model-sequentially
+  (prop/for-all [ops (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
+                (:valid? (analysis (->TicketMachine 0)
+                                   (sequential-history {:take  take-ticket
+                                                        :reset reset-machine}
+                                                       ops)))))
 
 (defspec machine1-should-have-linearizable-parallel-behaviour
   (prop/for-all [;; knossos.core/analysis doesn't like empty histories
