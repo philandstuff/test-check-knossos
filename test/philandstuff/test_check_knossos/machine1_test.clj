@@ -5,7 +5,7 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer :all]
-            [knossos.core :refer (linearizations)]
+            [knossos.core :refer (analysis)]
             [knossos.op :as op]))
 
 (defn annotate [id f history]
@@ -27,10 +27,11 @@
     @history))
 
 (defspec machine1-should-have-linearizable-parallel-behaviour
-  (prop/for-all [t1 (gen/vector (gen/elements [:take :reset]))
-                 t2 (gen/vector (gen/elements [:take :reset]))]
-                (every? #(not-empty (linearizations (->TicketMachine 0) %))
-                        (take 40 (repeatedly #(gen-one-history
-                                               {:take take-ticket
-                                                :reset reset-machine}
-                                               {:t1 t1 :t2 t2}))))))
+  (prop/for-all [;; knossos.core/analysis doesn't like empty histories
+                 t1 (gen/not-empty (gen/vector (gen/elements [:take :reset])))
+                 t2 (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
+                (every? #(:valid? (analysis (->TicketMachine 0) %))
+                          (take 40 (repeatedly #(gen-one-history
+                                                 {:take take-ticket
+                                                  :reset reset-machine}
+                                                 {:t1 t1 :t2 t2}))))))
