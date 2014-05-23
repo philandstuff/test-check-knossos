@@ -1,24 +1,12 @@
 (ns philandstuff.test-check-knossos.machine1-test
   (:require [philandstuff.test-check-knossos.machine1 :refer :all]
+            [philandstuff.test-check-knossos.model :refer (->TicketMachine)]
 
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer :all]
             [knossos.core :refer (linearizations)]
-            [knossos.op :as op])
-  (:import  [knossos.core Model]))
-
-(defrecord TicketMachine [next-ticket]
-  Model
-  (step [r op]
-    (condp = (:f op)
-      :reset (->TicketMachine 0)
-      :take  (let [acquired-ticket (:value op)]
-               (if-not (= acquired-ticket next-ticket)
-                 (knossos.core/inconsistent
-                  (str "Tried to take " acquired-ticket
-                       " from machine offerring " next-ticket))
-                 (->TicketMachine (inc next-ticket)))))))
+            [knossos.op :as op]))
 
 (defn annotate [id f history]
   (fn [me machine]
