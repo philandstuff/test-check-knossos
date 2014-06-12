@@ -66,12 +66,18 @@
                                     actions
                                     ops)))))
 
+(defn always [n prop]
+  (gen/fmap #(or (first (remove :result (drop-last %))) (last %))
+            (apply gen/tuple (repeat n prop))))
+
 (defspec machine1-should-have-linearizable-parallel-behaviour
-  (prop/for-all [;; knossos.core/analysis doesn't like empty histories
-                 t1 (gen/not-empty (gen/vector (gen/elements [:take :reset])))
-                 t2 (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
-                (every? #(:valid? (analysis (->TicketMachine 0) %))
-                          (take 40 (repeatedly #(recorded-parallel-history
-                                                 (m1/create-machine)
-                                                 actions
-                                                 {:t1 t1 :t2 t2}))))))
+  (always
+   40
+   (prop/for-all [ ;; knossos.core/analysis doesn't like empty histories
+                  t1 (gen/not-empty (gen/vector (gen/elements [:take :reset])))
+                  t2 (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
+                 (:valid? (analysis (->TicketMachine 0)
+                                    (recorded-parallel-history
+                                     (m1/create-machine)
+                                     actions
+                                     {:t1 t1 :t2 t2}))))))
