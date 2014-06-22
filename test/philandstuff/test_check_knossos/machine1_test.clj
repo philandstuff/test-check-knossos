@@ -1,6 +1,6 @@
 (ns philandstuff.test-check-knossos.machine1-test
   (:require [philandstuff.test-check-knossos.machine1 :as m1]
-            [philandstuff.test-check-knossos.model :refer (->TicketMachine)]
+            [philandstuff.test-check-knossos.model :refer (->TicketMachineModel)]
 
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
@@ -60,7 +60,7 @@
 
 (defspec machine1-should-fit-model-sequentially
   (prop/for-all [ops (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
-                (:valid? (analysis (->TicketMachine 0)
+                (:valid? (analysis (->TicketMachineModel 0)
                                    (sequential-history
                                     (m1/create-machine)
                                     actions
@@ -76,7 +76,7 @@
    (prop/for-all [ ;; knossos.core/analysis doesn't like empty histories
                   t1 (gen/not-empty (gen/vector (gen/elements [:take :reset])))
                   t2 (gen/not-empty (gen/vector (gen/elements [:take :reset])))]
-                 (:valid? (analysis (->TicketMachine 0)
+                 (:valid? (analysis (->TicketMachineModel 0)
                                     (recorded-parallel-history
                                      (m1/create-machine)
                                      actions
