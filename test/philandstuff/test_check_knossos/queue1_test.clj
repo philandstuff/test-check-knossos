@@ -3,21 +3,12 @@
             [philandstuff.test-check-knossos.model :refer (empty-queue-model)]
             [philandstuff.test-check-knossos.history :refer (sequential-history
                                                              recorded-parallel-history)]
-            [philandstuff.test-check-knossos.prop :refer (always)]
+            [philandstuff.test-check-knossos.prop :refer (always tuple*)]
 
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer :all]
             [knossos.core :refer (analysis)]))
-
-;; from ztellman/collection-check
-(defn- tuple* [& args]
-  (->> args
-    (map
-      #(if (and (map? %) (contains? % :gen))
-         %
-         (gen/return %)))
-    (apply gen/tuple)))
 
 (def actions
   {:enqueue (fn [q val] (q1/enqueue q val) val)
