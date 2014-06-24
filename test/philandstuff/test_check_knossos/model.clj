@@ -19,10 +19,10 @@
 
 (defrecord QueueModel [items]
   Model
-  (step [r op]
-    (condp = (:f op)
-      :enqueue (QueueModel. (conj items (:value op)))
-      :dequeue (let [acquired-item (:value op)]
+  (step [r {:keys [f value]}]
+    (condp = f
+      :enqueue (QueueModel. (conj items value))
+      :dequeue (let [acquired-item value]
                  (if-not (= acquired-item (first items))
                    (inconsistent
                     (str "Tried to take " acquired-item
