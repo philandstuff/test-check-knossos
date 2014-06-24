@@ -11,12 +11,12 @@
             [knossos.core :refer (analysis)]))
 
 (def actions
-  {:enqueue (fn [q val] (q0/enqueue q val) val)
-   :dequeue q0/dequeue})
+  {:add    (fn [q val] (q0/add q val) val)
+   :remove q0/remove})
 
 (def gen-queue-action
-  (gen/one-of [(tuple* :dequeue)
-               (tuple* :enqueue gen/int)]))
+  (gen/one-of [(tuple* :remove)
+               (tuple* :add gen/int)]))
 
 (defspec queue0-should-fit-model-sequentially
   (prop/for-all [ops (gen/not-empty (gen/vector gen-queue-action))]

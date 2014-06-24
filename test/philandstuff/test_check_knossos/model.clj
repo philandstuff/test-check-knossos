@@ -21,12 +21,12 @@
   Model
   (step [r {:keys [f value]}]
     (condp = f
-      :enqueue (QueueModel. (conj items value))
-      :dequeue (let [acquired-item value]
-                 (if-not (= acquired-item (first items))
-                   (inconsistent
-                    (str "Tried to take " acquired-item
-                         " from queue offering " (first items)))
-                   (QueueModel. (pop items)))))))
+      :add    (QueueModel. (conj items value))
+      :remove (let [acquired-item value]
+                (if-not (= acquired-item (first items))
+                  (inconsistent
+                   (str "Tried to take " acquired-item
+                        " from queue offering " (first items)))
+                  (QueueModel. (pop items)))))))
 
 (def empty-queue-model (QueueModel. PersistentQueue/EMPTY))
