@@ -16,9 +16,7 @@
           test-case))
 
 (defn wrap-fn-record-history
-  "TODO: Update this
-
-Wraps a fn to record invocations and successful returns in a
+  "Wraps a fn to record invocations and successful returns in a
   knossos history atom.  The atom should contain a vector, which will
   have new history items conjed onto it.  id is a keyword that
   represents this fn in the knossos history."
