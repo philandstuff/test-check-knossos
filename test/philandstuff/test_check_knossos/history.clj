@@ -32,7 +32,7 @@ Wraps a fn to record invocations and successful returns in a
     (let [history-start (swap! history conj (op/invoke me op nil))
           invoke-index  (dec (count history-start))
           value         (apply (actions op) machine args)]
-      (swap! history conj (op/ok me :take value))
+      (swap! history conj (op/ok me op value))
       (swap! history assoc-in [invoke-index :value] value))))
 
 (defn recorded-parallel-history
