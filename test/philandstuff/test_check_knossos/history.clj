@@ -1,20 +1,6 @@
 (ns philandstuff.test-check-knossos.history
   (:require [knossos.op :as op]))
 
-(defn sequential-history
-  "Executes a series of actions in sequence against a unit under test,
-  returning the recorded history
-
-  (sequential-history stack {:push push-fn, :pop pop-fn}
-                            [[:push 4] [:push 5] [:pop]])
-"
-  [target actions test-case]
-  (mapcat (fn [[action & args]]
-            (let [value (apply (actions action) target args)]
-              [(op/invoke :solo action value)
-               (op/ok     :solo action value)]))
-          test-case))
-
 (defn wrap-fn-record-history
   "Wraps a fn to record invocations and successful returns in a
   knossos history atom.  The atom should contain a vector, which will
@@ -43,3 +29,13 @@
                         (op process-id target))))]
     (dorun (map deref (.invokeAll clojure.lang.Agent/soloExecutor processes)))
     @history))
+
+(defn sequential-history
+  "Executes a series of actions in sequence against a unit under test,
+  returning the recorded history
+
+  (sequential-history stack {:push push-fn, :pop pop-fn}
+                            [[:push 4] [:push 5] [:pop]])
+"
+  [target actions test-case]
+  (recorded-parallel-history target actions {:solo test-case}))
