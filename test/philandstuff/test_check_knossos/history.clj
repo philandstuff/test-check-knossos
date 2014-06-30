@@ -22,8 +22,8 @@
   represents this fn in the knossos history."
   [actions [op & args] history]
   (fn [me target]
-    (let [_     (swap! history conj (op/invoke me op nil))
-          value (apply (actions op) target args)]
+    (swap! history conj (op/invoke me op nil))
+    (let [value (apply (actions op) target args)]
       (swap! history conj (op/ok me op value)))))
 
 (defn recorded-parallel-history
