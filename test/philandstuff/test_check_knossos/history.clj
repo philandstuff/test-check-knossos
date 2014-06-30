@@ -20,7 +20,7 @@
   in different interleavings of the parallel threads' execution.
 
   (recorded-parallel-history obj {:take take-fn, :put put-fn}
-                                 {:t1 [:take :take] :t2 [:take :put]})"
+                                 {:t1 [[:take] [:take]] :t2 [[:take] [:put 7]]})"
   [target actions test-case]
   (let [history   (atom [])
         processes (for [[process-id ops] test-case]
